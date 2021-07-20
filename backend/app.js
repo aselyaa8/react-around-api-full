@@ -3,6 +3,12 @@ const mongoose = require('mongoose');
 
 const { PORT = 3000 } = process.env;
 const app = express();
+const { celebrate, Joi } = require('celebrate');
+const {
+  login,
+  userCreateHandler,
+} = require('./controllers/users');
+
 app.use((req, res, next) => {
   req.user = {
     _id: '60b557968ecce3cbc417c023',
@@ -12,7 +18,16 @@ app.use((req, res, next) => {
 });
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
-
+app.post('/signin', login);
+app.post('/signup', celebrate({
+  body: Joi.object().keys({
+    email: Joi.string().required().email(),
+    password: Joi.string().required().min(8),
+    name: Joi.string().min(2).max(30),
+    avatar: Joi.string(),
+    about: Joi.string().min(2).max(30),
+  }).unknown(true),
+}), userCreateHandler);
 app.use('/users', require('./routes/users'));
 app.use('/cards', require('./routes/cards'));
 
