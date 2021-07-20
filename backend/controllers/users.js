@@ -78,6 +78,20 @@ const userAvatarUpdateHandler = (req, res) => {
     });
 };
 
+const userProfileGetHandler = (req, res) => {
+  User.findById(req.user._id)
+    .then((user) => {
+      if (user === null) {
+        return res.status(404).send({ message: 'User not found' });
+      }
+      return res.send({ user });
+    })
+    .catch((err) => {
+      if (err.name === 'CastError') return res.status(400).send({ message: 'Bad Request' });
+      return res.status(500).send({ message: err.message });
+    });
+};
+
 const login = (req, res) => {
   const { email, password } = req.body;
 
@@ -101,5 +115,6 @@ module.exports = {
   userCreateHandler,
   userProfileUpdateHandler,
   userAvatarUpdateHandler,
+  userProfileGetHandler,
   login,
 };
