@@ -8,14 +8,8 @@ const {
   login,
   userCreateHandler,
 } = require('./controllers/users');
+const auth = require('./middlewares/auth');
 
-app.use((req, res, next) => {
-  req.user = {
-    _id: '60b557968ecce3cbc417c023',
-  };
-
-  next();
-});
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 app.post('/signin', login);
@@ -28,6 +22,7 @@ app.post('/signup', celebrate({
     about: Joi.string().min(2).max(30),
   }).unknown(true),
 }), userCreateHandler);
+app.use(auth);
 app.use('/users', require('./routes/users'));
 app.use('/cards', require('./routes/cards'));
 
