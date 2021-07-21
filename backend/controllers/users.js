@@ -98,7 +98,7 @@ const userProfileGetHandler = (req, res) => {
 const login = (req, res) => {
   const { email, password } = req.body;
 
-  return User.findUserByCredentials(email, password)
+  return User.findUserByCredentials(email, password).select('+password')
     .then((user) => {
       const token = jwt.sign({
         _id: user._id,
