@@ -1,6 +1,6 @@
 const bcrypt = require('bcryptjs');
-const User = require('../models/user');
 const jwt = require('jsonwebtoken');
+const User = require('../models/user');
 
 const userHandler = (req, res) => {
   User.find({})
@@ -9,7 +9,10 @@ const userHandler = (req, res) => {
 };
 
 const userIdHandler = (req, res) => {
-  User.findById(req.params.id)
+  if (!req.params === req.user._id) {
+    return res.status(401).send({ message: 'Forbidden request' });
+  }
+  return User.findById(req.params.id)
     .then((user) => {
       if (user === null) {
         return res.status(404).send({ message: 'User not found' });

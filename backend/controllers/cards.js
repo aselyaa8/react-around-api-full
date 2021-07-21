@@ -20,7 +20,23 @@ const cardCreateHandler = (req, res) => {
 };
 
 const cardDeleteHandler = (req, res) => {
-  Card.findByIdAndRemove(req.params.id)
+  let isAuthorized = false;
+  Card.findById(req.params.id)
+    .then((card) => {
+      if (card.owner === req.user._id) {
+        isAuthorized = true;
+      }
+    })
+    .catch((err) => {
+      if (err.name === 'CastError') return res.status(400).send({ message: 'Bad Request' });
+      return res.status(500).send({ message: err.message });
+    });
+
+  if (!isAuthorized) {
+    return res.status(401).send({ message: 'Forbidden request' });
+  }
+
+  return Card.findByIdAndRemove(req.params.id)
     .then((card) => {
       if (card === null) {
         return res.status(404).send({ message: 'Card not found' });
