@@ -1,0 +1,23 @@
+
+.cards {
+  width: 100%;
+  display: -ms-grid;
+  display: grid;
+  -ms-grid-rows: 1fr 17px 1fr;
+  grid-template-rows: repeat(2, 1fr);
+  grid-template-columns: repeat( auto-fit, minmax(282px, 1fr));
+  grid-gap: 17px;
+  margin: 0;
+  margin-left: auto;
+  margin-right: auto;
+  margin-top: 46.25px;
+  font-family: 'Inter', Arial, sans-serif;
+  color: #000000;
+}
+
+@media screen and (max-width: 800px) {
+  .cards {
+    max-width: 282px;
+    margin-top: 36px;
+  }
+}

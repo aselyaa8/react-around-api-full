@@ -1,0 +1,14 @@
+.card__text {
+  font-style: normal;
+  font-weight: 900;
+  font-size: 24px;
+  line-height: 29px;
+  max-width: 225px;
+  margin-left: 21px;
+  margin-bottom: 31px;
+  padding: 0;
+  -o-text-overflow: ellipsis;
+     text-overflow: ellipsis;
+  white-space: nowrap;
+  overflow: hidden;
+}

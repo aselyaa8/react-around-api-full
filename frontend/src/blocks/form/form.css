@@ -1,0 +1,49 @@
+@import url(__heading/form__heading.css);
+@import url(__input/form__input.css);
+@import url(__input-error/form__input-error.css);
+@import url(__save-button/form__save-button.css);
+@import url(__save-button/_disabled/form__save-button_disabled.css);
+
+.form {
+  font-family: 'Inter', Arial, sans-serif;
+  color: #000000;
+  margin-left: auto;
+  margin-right: auto;
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-orient: vertical;
+  -webkit-box-direction: normal;
+      -ms-flex-direction: column;
+          flex-direction: column;
+  margin: auto;
+  background: #FFFFFF;
+  border-radius: 10px;
+  -webkit-box-shadow: 0px 0px 25px rgba(0, 0, 0, 0.15);
+          box-shadow: 0px 0px 25px rgba(0, 0, 0, 0.15);
+  width: 358px;
+  padding-left: 36px;
+  padding-right: 36px;
+  padding-bottom: 36.51px;
+}
+
+@media screen and (max-width: 800px) {
+  .form {
+    width: 238px;
+    padding-left: 22px;
+    padding-right: 22px;
+    padding-bottom: 25px;
+  }
+}
+
+@media screen and (max-width: 800px) {
+  .form-add {
+    width: 200px;
+    padding-left: 22px;
+    padding-right: 22px;
+    padding-bottom: 25px;
+  }
+}
+
+
+

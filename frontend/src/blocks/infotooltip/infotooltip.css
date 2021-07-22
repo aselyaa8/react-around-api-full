@@ -1,0 +1,49 @@
+.infotooltip {
+  font-family: 'Inter', Arial, sans-serif;
+  color: #000000;
+  margin-left: auto;
+  margin-right: auto;
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-orient: vertical;
+  -webkit-box-direction: normal;
+  -ms-flex-direction: column;
+  flex-direction: column;
+  background: #FFFFFF;
+  border-radius: 10px;
+  -webkit-box-shadow: 0px 0px 25px rgba(0, 0, 0, 0.15);
+  box-shadow: 0px 0px 25px rgba(0, 0, 0, 0.15);
+  width: 430px;
+  height: 330px;
+}
+
+.infotooltip__heading {
+  font-style: normal;
+  font-weight: 900;
+  font-size: 24px;
+  line-height: 29px;
+  margin-top: 32px;
+  text-align: center;
+  max-width: 358px;
+  margin-bottom: 60px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.infotooltip__img {
+  margin-top: 60px;
+  margin-bottom: 0;
+  width: 120px;
+  height: 120px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+@media screen and (max-width: 800px) {
+  .infotooltip__heading {
+    font-size: 18px;
+    line-height: 22px;
+    margin-top: 25px;
+  }
+}

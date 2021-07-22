@@ -1,0 +1,19 @@
+@import url(__container/modal__container.css);
+@import url(__close-button/modal__close-button.css);
+@import url(__figure/modal__figure.css);
+@import url(__image/modal__image.css);
+@import url(__image-caption/modal__image-caption.css);
+
+.modal {
+  display: none;
+  background: rgba(0, 0, 0, .5);
+  font-family: 'Inter', Arial, sans-serif;
+  visibility: hidden;
+  opacity: 0;
+  transition: visibility 0.8s linear, opacity 0.3s linear;
+  -webkit-transition: visibility 0.8s linear, opacity 0.3s linear;
+  -moz-transition: visibility 0.8s linear, opacity 0.3s linear;
+  -ms-transition: visibility 0.8s linear, opacity 0.3s linear;
+  -o-transition: visibility 0.8s linear, opacity 0.3s linear;
+}
+
