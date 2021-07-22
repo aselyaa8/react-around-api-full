@@ -1,6 +1,7 @@
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const User = require('../models/user');
+const ServerError = require('../errors/server-error');
 
 const userHandler = (req, res) => {
   User.find({})
@@ -10,7 +11,7 @@ const userHandler = (req, res) => {
 
 const userIdHandler = (req, res) => {
   if (!req.params === req.user._id) {
-    return res.status(401).send({ message: 'Forbidden request' });
+    return res.status(403).send({ message: 'Forbidden request' });
   }
   return User.findById(req.params.id)
     .then((user) => {
@@ -30,17 +31,26 @@ const userCreateHandler = (req, res) => {
     name, about, avatar, email, password,
   } = req.body;
 
-  bcrypt.hash(password, 10)
-    .then((hash) => User.create({
-      name,
-      about,
-      avatar,
-      email,
-      password: hash,
-    }))
-    .then((user) => res.send({ user }))
+  User.findOne({ email }).then((userExists) => {
+    if (userExists) {
+      return res.status(409).send({ message: 'Conflict, attempt to register a second account with the same email' });
+    }
+    return bcrypt.hash(password, 10)
+      .then((hash) => User.create({
+        name,
+        about,
+        avatar,
+        email,
+        password: hash,
+      }))
+      .then((user) => res.send({ user }))
+      .catch((err) => {
+        if (err.name === 'ValidationError') return res.status(400).send({ message: err.message });
+        return res.status(500).send({ message: err.message });
+      });
+  })
     .catch((err) => {
-      if (err.name === 'ValidationError') return res.status(400).send({ message: err.message });
+      if (err.name === 'CastError') return res.status(400).send({ message: 'Bad Request' });
       return res.status(500).send({ message: err.message });
     });
 };
@@ -97,7 +107,11 @@ const userProfileGetHandler = (req, res) => {
 
 const login = (req, res) => {
   const { email, password } = req.body;
-
+  if (!email || !password) {
+    return res
+      .status(400)
+      .send({ message: 'email or password should not be empty' });
+  }
   return User.findUserByCredentials(email, password).select('+password')
     .then((user) => {
       const token = jwt.sign({

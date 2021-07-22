@@ -33,7 +33,7 @@ const cardDeleteHandler = (req, res) => {
     });
 
   if (!isAuthorized) {
-    return res.status(401).send({ message: 'Forbidden request' });
+    return res.status(403).send({ message: 'Forbidden request' });
   }
 
   return Card.findByIdAndRemove(req.params.id)

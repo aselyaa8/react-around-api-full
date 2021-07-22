@@ -1,6 +1,6 @@
 const jwt = require('jsonwebtoken');
 
-const auth = (req, res, next) => {
+module.exports = (req, res, next) => {
   const { authorization } = req.headers;
   if (!authorization) {
     return res.status(401).send({ message: 'Authorization required' });
@@ -22,5 +22,3 @@ const auth = (req, res, next) => {
 
   next();
 };
-
-module.exports = { auth };
