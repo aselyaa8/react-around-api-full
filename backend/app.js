@@ -10,8 +10,9 @@ const {
   userCreateHandler,
 } = require('./controllers/users');
 const auth = require('./middlewares/auth');
+const NotFoundError = require('./errors/not-found-error');
 
-// app.use(express.static(path.join(__dirname, 'build')));
+//app.use(express.static(path.join(__dirname, 'build')));
 
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
@@ -29,12 +30,14 @@ app.post('/signup', celebrate({
 app.use('/users', require('./routes/users'));
 app.use('/cards', require('./routes/cards'));
 
-app.use('/', (req, res) => {
-  res.status(404).send({ message: 'Requested resource not found' });
+app.use('/', (req, res, next) => {
+  next(new NotFoundError('Requested resource not found'));
+  // res.status(404).send({ message: 'Requested resource not found' });
 });
 
-app.use('*', (req, res) => {
-  res.status(404).send({ message: 'Requested resource not found' });
+app.use('*', (req, res, next) => {
+  next(new NotFoundError('Requested resource not found'));
+  // res.status(404).send({ message: 'Requested resource not found' });
 });
 
 app.use((err, req, res, next) => {

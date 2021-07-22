@@ -1,39 +1,50 @@
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const User = require('../models/user');
-const ServerError = require('../errors/server-error');
+// const ServerError = require('../errors/server-error');
+const NotFoundError = require('../errors/not-found-error');
+const BadRequestError = require('../errors/bad-request-error');
+const ForbiddenError = require('../errors/forbidden-error');
+const ConflictError = require('../errors/conflict-error');
+const UnauthorizedError = require('../errors/unauthorized-error');
 
-const userHandler = (req, res) => {
+const userHandler = (req, res, next) => {
   User.find({})
     .then((users) => res.send(users))
-    .catch((err) => res.status(500).send({ message: err.message }));
+    .catch(next);
 };
 
-const userIdHandler = (req, res) => {
+const userIdHandler = (req, res, next) => {
   if (!req.params === req.user._id) {
-    return res.status(403).send({ message: 'Forbidden request' });
+    return next(new ForbiddenError('Forbidden request'));
+    // res.status(403).send({ message: 'Forbidden request' });
   }
   return User.findById(req.params.id)
     .then((user) => {
       if (user === null) {
-        return res.status(404).send({ message: 'User not found' });
+        next(new NotFoundError('User not found'));
+        // return res.status(404).send({ message: 'User not found' });
       }
       return res.send({ user });
     })
     .catch((err) => {
-      if (err.name === 'CastError') return res.status(400).send({ message: 'Bad Request' });
-      return res.status(500).send({ message: err.message });
+      if (err.name === 'CastError') return next(new BadRequestError('Bad Request'));
+      // res.status(400).send({ message: 'Bad Request' });
+      return next(err);
+      // return res.status(500).send({ message: err.message });
     });
 };
 
-const userCreateHandler = (req, res) => {
+const userCreateHandler = (req, res, next) => {
   const {
     name, about, avatar, email, password,
   } = req.body;
 
   User.findOne({ email }).then((userExists) => {
     if (userExists) {
-      return res.status(409).send({ message: 'Conflict, attempt to register a second account with the same email' });
+      return next(new ConflictError('Conflict, attempt to register a second account with the same email'));
+      // res.status(409).send({ message: 'Conflict
+      // attempt to register a second account with the same email' });
     }
     return bcrypt.hash(password, 10)
       .then((hash) => User.create({
@@ -45,17 +56,21 @@ const userCreateHandler = (req, res) => {
       }))
       .then((user) => res.send({ user }))
       .catch((err) => {
-        if (err.name === 'ValidationError') return res.status(400).send({ message: err.message });
-        return res.status(500).send({ message: err.message });
+        if (err.name === 'ValidationError') return next(new BadRequestError(err.message));
+        // res.status(400).send({ message: err.message });
+        return next(err);
+        // res.status(500).send({ message: err.message });
       });
   })
     .catch((err) => {
-      if (err.name === 'CastError') return res.status(400).send({ message: 'Bad Request' });
-      return res.status(500).send({ message: err.message });
+      if (err.name === 'CastError') return next(new BadRequestError('Bad Request'));
+      // res.status(400).send({ message: 'Bad Request' });
+      return next(err);
+      // res.status(500).send({ message: err.message });
     });
 };
 
-const userProfileUpdateHandler = (req, res) => {
+const userProfileUpdateHandler = (req, res, next) => {
   User.findByIdAndUpdate(
     req.user._id,
     { name: req.body.name, about: req.body.about },
@@ -63,17 +78,20 @@ const userProfileUpdateHandler = (req, res) => {
   )
     .then((user) => {
       if (user === null) {
-        return res.status(404).send({ message: 'User not found' });
+        next(new NotFoundError('User not found'));
+        // return res.status(404).send({ message: 'User not found' });
       }
       return res.send({ user });
     })
     .catch((err) => {
-      if (err.name === 'CastError') return res.status(400).send({ message: 'Bad Request' });
-      return res.status(500).send({ message: err.message });
+      if (err.name === 'CastError') return next(new BadRequestError('Bad Request'));
+      // res.status(400).send({ message: 'Bad Request' });
+      return next(err);
+      // return res.status(500).send({ message: err.message });
     });
 };
 
-const userAvatarUpdateHandler = (req, res) => {
+const userAvatarUpdateHandler = (req, res, next) => {
   User.findByIdAndUpdate(
     req.user._id,
     { avatar: req.body.avatar },
@@ -81,36 +99,43 @@ const userAvatarUpdateHandler = (req, res) => {
   )
     .then((user) => {
       if (user === null) {
-        return res.status(404).send({ message: 'User not found' });
+        next(new NotFoundError('User not found'));
+        // return res.status(404).send({ message: 'User not found' });
       }
       return res.send({ user });
     })
     .catch((err) => {
-      if (err.name === 'CastError') return res.status(400).send({ message: 'Bad Request' });
-      return res.status(500).send({ message: err.message });
+      if (err.name === 'CastError') return next(new BadRequestError('Bad Request'));
+      // res.status(400).send({ message: 'Bad Request' });
+      return next(err);
+      // return res.status(500).send({ message: err.message });
     });
 };
 
-const userProfileGetHandler = (req, res) => {
+const userProfileGetHandler = (req, res, next) => {
   User.findById(req.user._id)
     .then((user) => {
       if (user === null) {
-        return res.status(404).send({ message: 'User not found' });
+        next(new NotFoundError('User not found'));
+        // return res.status(404).send({ message: 'User not found' });
       }
       return res.send({ user });
     })
     .catch((err) => {
-      if (err.name === 'CastError') return res.status(400).send({ message: 'Bad Request' });
-      return res.status(500).send({ message: err.message });
+      if (err.name === 'CastError') return next(new BadRequestError('Bad Request'));
+      // res.status(400).send({ message: 'Bad Request' });
+      return next(err);
+      // res.status(500).send({ message: err.message });
     });
 };
 
-const login = (req, res) => {
+const login = (req, res, next) => {
   const { email, password } = req.body;
   if (!email || !password) {
-    return res
-      .status(400)
-      .send({ message: 'email or password should not be empty' });
+    return next(new BadRequestError('email or password should not be empty'));
+    // res
+    //   .status(400)
+    //   .send({ message: 'email or password should not be empty' });
   }
   return User.findUserByCredentials(email, password).select('+password')
     .then((user) => {
@@ -120,9 +145,10 @@ const login = (req, res) => {
       res.send({ token });
     })
     .catch((err) => {
-      res
-        .status(401)
-        .send({ message: err.message });
+      next(new UnauthorizedError(err.message));
+      // res
+      //   .status(401)
+      //   .send({ message: err.message });
     });
 };
 

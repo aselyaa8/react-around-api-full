@@ -1,12 +1,16 @@
+const BadRequestError = require('../errors/bad-request-error');
+const ForbiddenError = require('../errors/forbidden-error');
+const NotFoundError = require('../errors/not-found-error');
 const Card = require('../models/card');
 
-const cardsHandler = (req, res) => {
+const cardsHandler = (req, res, next) => {
   Card.find({}).populate('user')
     .then((cards) => res.send(cards))
-    .catch((err) => res.status(500).send({ message: err.message }));
+    .catch(next);
+  // res.status(500).send({ message: err.message })
 };
 
-const cardCreateHandler = (req, res) => {
+const cardCreateHandler = (req, res, next) => {
   const { name, link } = req.body;
   const owner = req.user._id;
   Card.create({ name, link, owner })
@@ -14,12 +18,14 @@ const cardCreateHandler = (req, res) => {
       res.send({ card });
     })
     .catch((err) => {
-      if (err.name === 'ValidationError') return res.status(400).send({ message: err.message });
-      return res.status(500).send({ message: err.message });
+      if (err.name === 'ValidationError') return next(new BadRequestError(err.message));
+      // res.status(400).send({ message: err.message });
+      return next(err);
+      // res.status(500).send({ message: err.message });
     });
 };
 
-const cardDeleteHandler = (req, res) => {
+const cardDeleteHandler = (req, res, next) => {
   let isAuthorized = false;
   Card.findById(req.params.id)
     .then((card) => {
@@ -28,58 +34,70 @@ const cardDeleteHandler = (req, res) => {
       }
     })
     .catch((err) => {
-      if (err.name === 'CastError') return res.status(400).send({ message: 'Bad Request' });
-      return res.status(500).send({ message: err.message });
+      if (err.name === 'CastError') return next(new BadRequestError('Bad Request'));
+      // res.status(400).send({ message: 'Bad Request' });
+      return next(err);
+      // res.status(500).send({ message: err.message });
     });
 
   if (!isAuthorized) {
-    return res.status(403).send({ message: 'Forbidden request' });
+    return next(new ForbiddenError('Forbidden request'));
+    // res.status(403).send({ message: 'Forbidden request' });
   }
 
   return Card.findByIdAndRemove(req.params.id)
     .then((card) => {
       if (card === null) {
-        return res.status(404).send({ message: 'Card not found' });
+        return next(new NotFoundError('Card not found'));
+        // res.status(404).send({ message: 'Card not found' });
       }
       return res.send({ card });
     })
     .catch((err) => {
-      if (err.name === 'CastError') return res.status(400).send({ message: 'Bad Request' });
-      return res.status(500).send({ message: err.message });
+      if (err.name === 'CastError') return next(new BadRequestError('Bad Request'));
+      // res.status(400).send({ message: 'Bad Request' });
+      return next(err);
+      // res.status(500).send({ message: err.message });
     });
 };
 
-const cardLikeAddHandler = (req, res) => {
+const cardLikeAddHandler = (req, res, next) => {
   Card.findByIdAndUpdate(
     req.params.cardId,
     { $addToSet: { likes: req.user._id } },
     { new: true },
   ).then((card) => {
     if (card === null) {
-      return res.status(404).send({ message: 'Card not found' });
+      return next(new NotFoundError('Card not found'));
+      // res.status(404).send({ message: 'Card not found' });
     }
     return res.send({ card });
   })
     .catch((err) => {
-      if (err.name === 'CastError') return res.status(400).send({ message: 'Bad Request' });
-      return res.status(500).send({ message: err.message });
+      if (err.name === 'CastError') return next(new BadRequestError('Bad Request'));
+      // res.status(400).send({ message: 'Bad Request' });
+      return next(err);
+      // res.status(500).send({ message: err.message });
     });
 };
 
-const cardLikeDeleteHandler = (req, res) => {
+const cardLikeDeleteHandler = (req, res, next) => {
   Card.findByIdAndUpdate(
     req.params.cardId,
     { $pull: { likes: req.user._id } },
     { new: true },
   ).then((card) => {
     if (card === null) {
-      return res.status(404).send({ message: 'Card not found' });
+      return next(new NotFoundError('Card not found'));
+      // res.status(404).send({ message: 'Card not found' });
     }
     return res.send({ card });
   })
     .catch((err) => {
-      if (err.name === 'CastError') return res.status(400).send({ message: 'Bad Request' });
-      return res.status(500).send({ message: err.message });
+      if (err.name === 'CastError') return next(new BadRequestError('Bad Request'));
+      // res.status(400).send({ message: 'Bad Request' });
+      return next(err);
+      // res.status(500).send({ message: err.message });
     });
 };
 
