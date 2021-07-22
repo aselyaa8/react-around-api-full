@@ -81,7 +81,7 @@ class Api {
 
 
 const api = new Api({
-    baseUrl: "http://localhost:3000",
+    baseUrl: "https://api.assel.students.nomoreparties.site/",
     headers: {
         authorization: "1700817e-a1e9-4638-acf5-4cd690372eaf",
         "Content-Type": "application/json"
