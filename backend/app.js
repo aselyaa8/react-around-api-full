@@ -1,10 +1,10 @@
 const express = require('express');
-const path = require('path');
 const mongoose = require('mongoose');
 
 const { PORT = 3000 } = process.env;
 const app = express();
 const { celebrate, Joi, errors } = require('celebrate');
+const cors = require('cors');
 const {
   login,
   userCreateHandler,
@@ -13,8 +13,8 @@ const auth = require('./middlewares/auth');
 const NotFoundError = require('./errors/not-found-error');
 const { requestLogger, errorLogger } = require('./middlewares/logger');
 
-//app.use(express.static(path.join(__dirname, 'build')));
-
+app.use(cors());
+app.options('*', cors());
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 
@@ -35,7 +35,7 @@ app.post('/signup', celebrate({
     about: Joi.string().min(2).max(30),
   }).unknown(true),
 }), userCreateHandler);
-// app.use(auth);
+app.use(auth);
 app.use('/users', require('./routes/users'));
 app.use('/cards', require('./routes/cards'));
 
