@@ -29,10 +29,13 @@ function App() {
   const [loggedIn, setLoggedIn] = useState(false);
   const history = useHistory();
   const [registerStatus, setRegisterStatus] = useState({ registered: false, showModal: false });
+  const [token, setToken] = useState('');
 
   useEffect(() => {
     function handleTokenCheck() {
       const token = localStorage.getItem('token');
+      setToken(token);
+      console.log('Check Token:' + token);
       if (token) {
         auth.checkToken(token).then(() => {
           setLoggedIn(true);
@@ -45,25 +48,27 @@ function App() {
   }, []);
 
   useEffect(() => {
-    api.getUserInfo().then((res) => {
+    console.log('User Info:' + token);
+    api.getUserInfo(token).then((res) => {
       setCurrentUser(res);
     }).catch((err) => {
       console.log(err);
     });
-  }, []);
+  }, [token]);
 
   useEffect(() => {
-    api.getInitialCards().then((res) => {
+    console.log('Initial cards:' + token);
+    api.getInitialCards(token).then((res) => {
       setCards(res);
     }).catch((err) => {
       console.log(err);
     });
-  }, []);
+  }, [token]);
 
   function handleCardLike(card) {
     const isLiked = card.likes.some(i => i._id === currentUser._id);
     if (isLiked) {
-      api.removeLike(card._id).then((newCard) => {
+      api.removeLike(token, card._id).then((newCard) => {
         setCards(cards.map((c) => {
           return c._id === newCard._id ? newCard : c
         }))
@@ -71,7 +76,7 @@ function App() {
         console.log(err);
       });
     } else {
-      api.addLike(card._id).then((newCard) => {
+      api.addLike(token, card._id).then((newCard) => {
         setCards(cards.map((c) => {
           return c._id === newCard._id ? newCard : c
         }))
@@ -106,7 +111,7 @@ function App() {
   }
 
   function handleUpdateUser({ name, about }) {
-    api.updateUserInfo({ name, about }).then((res) => {
+    api.updateUserInfo(token, { name, about }).then((res) => {
       setCurrentUser(res);
       handleCloseAllModals();
     }).catch((err) => {
@@ -115,7 +120,7 @@ function App() {
   }
 
   function handleUpdateUserAvatar(avatar) {
-    api.updateUserAvatar(avatar).then((res) => {
+    api.updateUserAvatar(token, avatar).then((res) => {
       setCurrentUser(res);
       handleCloseAllModals();
     }).catch((err) => {
@@ -129,7 +134,7 @@ function App() {
 
   function handleCardDeleteConfirm() {
     if (confirmDeletePopup.isOpen && confirmDeletePopup.id) {
-      api.deleteCard(confirmDeletePopup.id).then(() => {
+      api.deleteCard(token, confirmDeletePopup.id).then(() => {
         setCards(cards.filter((c) => {
           return c._id !== confirmDeletePopup.id;
         }));
@@ -143,7 +148,7 @@ function App() {
   }
 
   function handleAddPlace(card) {
-    api.postCard(card).then((newCard) => {
+    api.postCard(token, card).then((newCard) => {
       setCards([newCard, ...cards]);
       handleCloseAllModals();
     }).catch((err) => {
@@ -186,6 +191,7 @@ function App() {
 
   function handleRegister(email, password) {
     auth.register(email, password).then((res) => {
+      console.log(res)
       if (res) {
         setRegisterStatus({ registered: true, showModal: true });
       } else {

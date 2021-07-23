@@ -17,7 +17,8 @@
     "build": "react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject",
-    "deploy": "npm run build && scp -r -i ~/.ssh/id_ed25519 ./build/* asel11k97@assel.students.nomoreparties.site:/home/asel11k97/around-frontend"
+    "deploy": "npm run build && scp -r -i ~/.ssh/id_ed25519 ./build/* asel11k97@assel.students.nomoreparties.site:/home/asel11k97/around-frontend",
+    "local": "npm run build && rm -rf ../backend/build && mv build ../backend/"
   },
   "eslintConfig": {
     "extends": [

@@ -1,6 +1,7 @@
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const User = require('../models/user');
+require('dotenv').config();
 // const ServerError = require('../errors/server-error');
 const NotFoundError = require('../errors/not-found-error');
 const BadRequestError = require('../errors/bad-request-error');
@@ -39,7 +40,6 @@ const userCreateHandler = (req, res, next) => {
   const {
     name, about, avatar, email, password,
   } = req.body;
-
   User.findOne({ email }).then((userExists) => {
     if (userExists) {
       return next(new ConflictError('Conflict, attempt to register a second account with the same email'));
@@ -130,7 +130,6 @@ const userProfileGetHandler = (req, res, next) => {
 };
 
 const login = (req, res, next) => {
-  console.log('begining of login controller');
   const { email, password } = req.body;
   if (!email || !password) {
     return next(new BadRequestError('email or password should not be empty'));
@@ -138,15 +137,16 @@ const login = (req, res, next) => {
     //   .status(400)
     //   .send({ message: 'email or password should not be empty' });
   }
-  return User.findUserByCredentials(email, password).select('+password')
+  console.log(email, password);
+  return User.findUserByCredentials(email, password)
     .then((user) => {
-      console.log('login controller token send');
       const token = jwt.sign({
         _id: user._id,
-      }, 'super-strong-secret', { expiresIn: '7d' });
+      }, process.env.JWT_SECRET, { expiresIn: '7d' });
       res.send({ token });
     })
     .catch((err) => {
+      console.log(err);
       next(new UnauthorizedError(err.message));
       // res
       //   .status(401)

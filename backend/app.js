@@ -1,5 +1,7 @@
 const express = require('express');
 const mongoose = require('mongoose');
+const path = require('path');
+
 
 const { PORT = 3000 } = process.env;
 const app = express();
@@ -13,24 +15,23 @@ const auth = require('./middlewares/auth');
 const NotFoundError = require('./errors/not-found-error');
 const { requestLogger, errorLogger } = require('./middlewares/logger');
 
+app.use(express.static(path.join(__dirname, 'build')));
+
 app.use(cors());
-app.use((req, res, next) => {
-  res.header('Access-Control-Allow-Origin', '*');
-  next();
-});
 app.options('*', cors());
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 
 app.use(requestLogger);
-console.log('inside app.js before all routes');
-app.post('/signin', celebrate({
+
+app.post('/api/signin', celebrate({
   body: Joi.object().keys({
     email: Joi.string().required().email(),
     password: Joi.string().required().min(8),
   }).unknown(true),
 }), login);
-app.post('/signup', celebrate({
+
+app.post('/api/signup', celebrate({
   body: Joi.object().keys({
     email: Joi.string().required().email(),
     password: Joi.string().required().min(8),
@@ -39,9 +40,10 @@ app.post('/signup', celebrate({
     about: Joi.string().min(2).max(30),
   }).unknown(true),
 }), userCreateHandler);
+
 app.use(auth);
-app.use('/users', require('./routes/users'));
-app.use('/cards', require('./routes/cards'));
+app.use('/api/users', require('./routes/users'));
+app.use('/api/cards', require('./routes/cards'));
 
 app.use('/', (req, res, next) => {
   next(new NotFoundError('Requested resource not found'));
