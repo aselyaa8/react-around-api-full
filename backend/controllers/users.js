@@ -130,6 +130,7 @@ const userProfileGetHandler = (req, res, next) => {
 };
 
 const login = (req, res, next) => {
+  console.log('begining of login controller');
   const { email, password } = req.body;
   if (!email || !password) {
     return next(new BadRequestError('email or password should not be empty'));
@@ -139,6 +140,7 @@ const login = (req, res, next) => {
   }
   return User.findUserByCredentials(email, password).select('+password')
     .then((user) => {
+      console.log('login controller token send');
       const token = jwt.sign({
         _id: user._id,
       }, 'super-strong-secret', { expiresIn: '7d' });
