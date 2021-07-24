@@ -29,13 +29,10 @@ function App() {
   const [loggedIn, setLoggedIn] = useState(false);
   const history = useHistory();
   const [registerStatus, setRegisterStatus] = useState({ registered: false, showModal: false });
-  const [token, setToken] = useState('');
+  const [token, setToken] = useState(() => localStorage.getItem('jwt'));
 
   useEffect(() => {
     function handleTokenCheck() {
-      const token = localStorage.getItem('token');
-      setToken(token);
-      console.log('Check Token:' + token);
       if (token) {
         auth.checkToken(token).then(() => {
           setLoggedIn(true);
@@ -45,19 +42,17 @@ function App() {
       }
     }
     handleTokenCheck();
-  }, []);
+  }, [history, token]);
 
   useEffect(() => {
-    console.log('User Info:' + token);
     api.getUserInfo(token).then((res) => {
-      setCurrentUser(res);
+      setCurrentUser(res.user);
     }).catch((err) => {
       console.log(err);
     });
   }, [token]);
 
   useEffect(() => {
-    console.log('Initial cards:' + token);
     api.getInitialCards(token).then((res) => {
       setCards(res);
     }).catch((err) => {
@@ -66,7 +61,7 @@ function App() {
   }, [token]);
 
   function handleCardLike(card) {
-    const isLiked = card.likes.some(i => i._id === currentUser._id);
+    const isLiked = card.likes.some(i => i === currentUser._id);
     if (isLiked) {
       api.removeLike(token, card._id).then((newCard) => {
         setCards(cards.map((c) => {
@@ -112,7 +107,7 @@ function App() {
 
   function handleUpdateUser({ name, about }) {
     api.updateUserInfo(token, { name, about }).then((res) => {
-      setCurrentUser(res);
+      setCurrentUser(res.user);
       handleCloseAllModals();
     }).catch((err) => {
       console.log(err);
@@ -121,7 +116,7 @@ function App() {
 
   function handleUpdateUserAvatar(avatar) {
     api.updateUserAvatar(token, avatar).then((res) => {
-      setCurrentUser(res);
+      setCurrentUser(res.user);
       handleCloseAllModals();
     }).catch((err) => {
       console.log(err);
@@ -157,7 +152,8 @@ function App() {
   }
 
   function handleSignOut() {
-    localStorage.removeItem('token');
+    setToken('');
+    localStorage.removeItem('jwt');
     setLoggedIn(false);
     history.push('/signin');
   }
@@ -166,32 +162,20 @@ function App() {
     setLoggedIn(true);
   }
 
-  // function handleTokenCheck() {
-  //   const token = localStorage.getItem('token');
-  //   if (token) {
-  //     auth.checkToken(token).then(() => {
-  //       setLoggedIn(true);
-  //     }).then(() => {
-  //       history.push('/');
-  //     });
-  //   }
-  // }
-
   function handleAuthorize(email, password) {
     auth.authorize(email, password)
       .then((data) => {
         if (data.token) {
           handleLogin();
+          setToken(data.token);
           history.push('/');
         }
       })
       .catch(err => console.log(err));
   }
 
-
   function handleRegister(email, password) {
     auth.register(email, password).then((res) => {
-      console.log(res)
       if (res) {
         setRegisterStatus({ registered: true, showModal: true });
       } else {
@@ -229,7 +213,7 @@ function App() {
             {registerStatus.showModal && <InfoTooltip onClose={handleInfoTooltipClose} message={InfoTooltipMessage} imgSrc={InfoTooltipImgSrc} />}
           </Route>
           <Route path="/signin">
-            <Login handleLogin={handleLogin} handleAuthorize={handleAuthorize} />
+            <Login handleAuthorize={handleAuthorize} />
           </Route>
           <ProtectedRoute path="/" loggedIn={loggedIn}
             onEditProfile={handleEditProfileClick}

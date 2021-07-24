@@ -22,8 +22,7 @@ const userSchema = new mongoose.Schema({
     required: true,
     validate: {
       validator: function validate(v) {
-        // eslint-disable-next-line
-        return /^(?:http(s)?:\/\/)?[\w.-]+(?:\.[\w\.-]+)+[\w\-\._~:\/?#[\]@!\$&'\(\)\*\+,;=.]+$/.test(v);
+        return validator.isURL(v);
       },
     },
     default: 'https://pictures.s3.yandex.net/resources/avatar_1604080799.jpg',

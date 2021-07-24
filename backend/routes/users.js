@@ -1,6 +1,5 @@
 const router = require('express').Router();
 const { celebrate, Joi } = require('celebrate');
-const validator = require('validator');
 const {
   userHandler,
   userIdHandler,
@@ -9,12 +8,8 @@ const {
   userProfileGetHandler,
 } = require('../controllers/users');
 
-function validateUrl(string) {
-  return validator.isURL(string);
-}
-
 router.get('/', userHandler);
-
+router.get('/me', userProfileGetHandler);
 router.get('/:id', userIdHandler);
 
 router.patch('/me', celebrate({
@@ -24,11 +19,9 @@ router.patch('/me', celebrate({
   }).unknown(true),
 }), userProfileUpdateHandler);
 
-router.get('/me', userProfileGetHandler);
-
 router.patch('/me/avatar', celebrate({
   body: Joi.object().keys({
-    avatar: Joi.string().custom(validateUrl),
+    avatar: Joi.string(),
   }).unknown(true),
 }), userAvatarUpdateHandler);
 

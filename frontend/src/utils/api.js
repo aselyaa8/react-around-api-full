@@ -1,5 +1,3 @@
-// Token: 1700817e-a1e9-4638-acf5-4cd690372eaf
-// Group ID: group-9
 
 class Api {
   constructor({ baseUrl, headers }) {
@@ -105,13 +103,11 @@ class Api {
 
 
 const api = new Api({
-  baseUrl: "http://localhost:3000/api",
+  baseUrl: "https://api.assel.students.nomoreparties.site",
   headers: {
-    // authorization: `Bearer ${token}`,
     "Content-Type": "application/json",
   }
 });
 
 export default api;
-// https://api.assel.students.nomoreparties.site
-// authorization: "1700817e-a1e9-4638-acf5-4cd690372eaf"
+

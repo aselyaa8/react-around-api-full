@@ -1,4 +1,4 @@
-export const BASE_URL = 'http://localhost:3000/api';
+export const BASE_URL = 'https://api.assel.students.nomoreparties.site';
 
 export const register = (email, password) => {
   return fetch(`${BASE_URL}/signup`, {
@@ -6,7 +6,6 @@ export const register = (email, password) => {
     headers: {
       'Accept': 'application/json',
       'Content-Type': 'application/json',
-      // 'Content-Security-Policy': default-src 'self'; script-src 'self' https://register.nomoreparties.co;,
     },
     body: JSON.stringify({
       email,
@@ -30,7 +29,7 @@ export const authorize = (email, password) => {
   }).then((response => response.json()))
     .then((data) => {
       if (data.token) {
-        localStorage.setItem('token', data.token);
+        localStorage.setItem('jwt', data.token);
         console.log(data.token);
         return data;
       }

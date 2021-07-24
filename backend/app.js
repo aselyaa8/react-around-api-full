@@ -2,7 +2,6 @@ const express = require('express');
 const mongoose = require('mongoose');
 const path = require('path');
 
-
 const { PORT = 3000 } = process.env;
 const app = express();
 const { celebrate, Joi, errors } = require('celebrate');
@@ -23,15 +22,19 @@ app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 
 app.use(requestLogger);
-
-app.post('/api/signin', celebrate({
+app.get('/crash-test', () => {
+  setTimeout(() => {
+    throw new Error('Server will crash now');
+  }, 0);
+});
+app.post('/signin', celebrate({
   body: Joi.object().keys({
     email: Joi.string().required().email(),
     password: Joi.string().required().min(8),
   }).unknown(true),
 }), login);
 
-app.post('/api/signup', celebrate({
+app.post('/signup', celebrate({
   body: Joi.object().keys({
     email: Joi.string().required().email(),
     password: Joi.string().required().min(8),
@@ -42,17 +45,16 @@ app.post('/api/signup', celebrate({
 }), userCreateHandler);
 
 app.use(auth);
-app.use('/api/users', require('./routes/users'));
-app.use('/api/cards', require('./routes/cards'));
+
+app.use('/users', require('./routes/users'));
+app.use('/cards', require('./routes/cards'));
 
 app.use('/', (req, res, next) => {
   next(new NotFoundError('Requested resource not found'));
-  // res.status(404).send({ message: 'Requested resource not found' });
 });
 
 app.use('*', (req, res, next) => {
   next(new NotFoundError('Requested resource not found'));
-  // res.status(404).send({ message: 'Requested resource not found' });
 });
 
 app.use(errorLogger);
