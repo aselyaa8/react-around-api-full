@@ -1,6 +1,5 @@
 const express = require('express');
 const mongoose = require('mongoose');
-const path = require('path');
 
 const { PORT = 3000 } = process.env;
 const app = express();
@@ -13,8 +12,6 @@ const {
 const auth = require('./middlewares/auth');
 const NotFoundError = require('./errors/not-found-error');
 const { requestLogger, errorLogger } = require('./middlewares/logger');
-
-app.use(express.static(path.join(__dirname, 'build')));
 
 app.use(cors());
 app.options('*', cors());
