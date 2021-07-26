@@ -47,7 +47,12 @@ const userCreateHandler = (req, res, next) => {
         email,
         password: hash,
       }))
-      .then((user) => res.send({ user }))
+      .then((user) => {
+        res.send({
+          _id: user._id,
+          email: user.email,
+        });
+      })
       .catch((err) => {
         if (err.name === 'ValidationError') return next(new BadRequestError(err.message));
         return next(err);
@@ -118,7 +123,7 @@ const login = (req, res, next) => {
     .then((user) => {
       const token = jwt.sign({
         _id: user._id,
-      }, process.env.JWT_SECRET, { expiresIn: '7d' });
+      }, process.env.JWT_SECRET ? process.env.JWT_SECRET : 'default-key', { expiresIn: '7d' });
       res.send({ token });
     })
     .catch((err) => {

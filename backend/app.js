@@ -1,5 +1,6 @@
 const express = require('express');
 const mongoose = require('mongoose');
+const path = require('path');
 
 const { PORT = 3000 } = process.env;
 const app = express();
@@ -9,7 +10,9 @@ const {
   login,
   userCreateHandler,
 } = require('./controllers/users');
+const validateURL = require('./utils/validateURL');
 const auth = require('./middlewares/auth');
+const errorHandler = require('./middlewares/errorHandler');
 const NotFoundError = require('./errors/not-found-error');
 const { requestLogger, errorLogger } = require('./middlewares/logger');
 
@@ -17,7 +20,7 @@ app.use(cors());
 app.options('*', cors());
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
-
+app.use(express.static(path.join(__dirname, 'build')));
 app.use(requestLogger);
 app.get('/crash-test', () => {
   setTimeout(() => {
@@ -36,7 +39,7 @@ app.post('/signup', celebrate({
     email: Joi.string().required().email(),
     password: Joi.string().required().min(8),
     name: Joi.string().min(2).max(30),
-    avatar: Joi.string(),
+    avatar: Joi.string().custom(validateURL),
     about: Joi.string().min(2).max(30),
   }).unknown(true),
 }), userCreateHandler);
@@ -56,16 +59,7 @@ app.use('*', (req, res, next) => {
 
 app.use(errorLogger);
 app.use(errors());
-app.use((err, req, res, next) => {
-  const { statusCode = 500, message } = err;
-  res
-    .status(statusCode)
-    .send({
-      message: statusCode === 500
-        ? 'An error occurred on the server'
-        : message,
-    });
-});
+app.use(errorHandler);
 
 mongoose.connect('mongodb://localhost:27017/aroundb', {
   useNewUrlParser: true,
