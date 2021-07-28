@@ -25,6 +25,9 @@ const cardCreateHandler = (req, res, next) => {
 const cardDeleteHandler = (req, res, next) => {
   Card.findById(req.params.id)
     .then((card) => {
+      if (!card) {
+        return next(new NotFoundError('Card not found'));
+      }
       if (card.owner.toString() === req.user._id) {
         return Card.findByIdAndRemove(req.params.id)
           .then((removedCard) => {
