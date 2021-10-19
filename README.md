@@ -32,7 +32,7 @@ Functionalities:
 - Winston is used to provide error and request logging for easier maintenance
 
 ## Tech
-React, React router, NodeJS, Express.js, MongoDB, GPC
+React, React router, NodeJS, Express.js, MongoDB, GCP
 
 ## Future improvements
  - Adding comments section
